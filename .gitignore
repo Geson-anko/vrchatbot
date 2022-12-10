@@ -1,5 +1,4 @@
 poetry.lock
-data/API_KEY.txt
 data/test_results/*
 data/logs/*
 .vscode
