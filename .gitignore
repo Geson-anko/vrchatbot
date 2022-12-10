@@ -1,6 +1,8 @@
 poetry.lock
 data/test_results/*
-data/logs/*
+!data/test_results/.gitkeep
+data/logs/*.logs
+data/API_KEY.txt
 .vscode
 
 # Byte-compiled / optimized / DLL files
