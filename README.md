@@ -29,7 +29,7 @@ pip install .
 
 ## OpenAIのAPI KEY 取得
 [OpenAIのAPIKEYをここから取得してください](https://beta.openai.com/account/api-keys)  
-取得したAPI KEYは `data/API_KEY.txt` に書き込んでください。  
+取得したAPI KEYは `data/API_KEY.txt` を作成しその中に書き込んでください。  
 
 
 ## オーディオデバイスの確認  
