@@ -94,7 +94,7 @@ class ChatBot:
         else:
             head = [self.behaivour_prompt]
 
-        sending_prompt = head + list(self.stored_prompts) + [user_input]
+        sending_prompt = " ".join(head + list(self.stored_prompts) + [user_input])
 
         resp = openai.Completion.create(
             engine=self.engine,
