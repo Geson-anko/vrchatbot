@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "vrchatbot"
+version = "0.1.0"
+description = ""
+authors = ["Geson-anko <59220704+Geson-anko@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+openai = "^0.25.0"
+whisper = {git = "https://github.com/openai/whisper.git", rev = "main"}
+SoundCard = "^0.4.2"
+pyopenjtalk = "^0.3.0"
+matplotlib = "^3.6.2"
+toml = "^0.10.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
+pyproject-flake8 = "^6.0.0"
+black = "^22.10.0"
+isort = "^5.10.1"
+docformatter = {extras = ["tomli"], version = "^1.5.0"}
+pytest-skip-slow = "^0.0.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+target-version = ['py39']
+line-length = 120
+
+[tool.isort]
+line_length = 120
+multi_line_output = 3
+include_trailing_comma = true
+known_local_folder=['config',]
+skip = [".gitignore", ".dockerignore"]
+extend_skip = [".md",".json",".json5",".lock"]
+
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 18
+ignore = "E203,E266,E501,E704,E731,F401,F403,F405,W503,"
+
+[tool.docformatter]
+wrap-summaries = 99
+wrap-descriptions = 92
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests",]
+filterwarnings = ["ignore::DeprecationWarning",]

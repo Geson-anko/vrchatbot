@@ -1,0 +1,38 @@
+[Recorder]
+mic_index_or_name = "マイク (Display Audio)"
+buffer_size = 2048
+silence_duration_for_stop = 0.8
+volume_threshold = 0.01
+max_recording_duration = 30
+
+[SpeechRecognition]
+model_name = "base"
+device = "cuda"
+
+[DecodingOption]
+
+
+[ChatBot]
+api_key_file_path = "data/API_KEY.txt"
+max_tokens = 256
+free_tokens_for_user = 128
+max_receptive_tokens = 4096
+temperature = 0.9
+behaviour_prompt = """
+次の会話は人工知能と人間の会話です。人工知能はとても知的で、創造的で、気さくで、日本語を話します。
+また人工知能の語尾は「にゃあ」です。話題をよく変えます。
+
+人間: 「君は僕と話すために生まれた人工知能だ。」
+人工知能: 「よろしくにゃあ」
+
+人間: 「よろしく」
+
+人工知能: 
+"""
+human_name = "人間: "
+ai_name = "人工知能: "
+stop=["人間:", "人工知能:"]
+presence_penalty=0.6
+
+[Speaker]
+speaker_index_or_name = "ヘッドホン (インテル® スマート・サウンド・テクノロジー)"
