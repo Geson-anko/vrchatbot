@@ -86,6 +86,7 @@ class Recorder:
         volume_threshold: float = 0.01,
         silence_check_chunk: int = 1024,
         max_recording_duration: float = 30.0,  # seconds
+        silence_check_stride: Optional[int] = None,
     ) -> None:
         """
         Args:
@@ -96,6 +97,7 @@ class Recorder:
             volume_threshold (float): Volume threshold for checking silence.
             silence_check_chunk (float): Check chunk size for `is_silent`
             max_recording_duration (float): Max recording duration [seconds.]
+            silence_check_stride (Optional[int]): Stride size for `check_silence_end_point`
 
         Raises:
             ValueError: if mic_index_or_name is not str or int.
@@ -119,6 +121,7 @@ class Recorder:
         self.volume_threshold = volume_threshold
         self.silence_check_chunk = silence_check_chunk
         self.max_recording_duration = max_recording_duration
+        self.silence_check_stride = silence_check_stride
 
     def record_audio_until_silence(self, waiting_timeout: float = 5) -> Optional[np.ndarray]:
         """Recording from mic until silence continues decided duration. And, Record begins when
@@ -142,7 +145,9 @@ class Recorder:
                 math.ceil((waiting_timeout + self.max_recording_duration) * self.sample_rate / self.buffer_size)
             ):  # Avoid while True
                 wave = mic.record(self.buffer_size).reshape(-1).astype("float32")
-                start_idx = check_silence_end_point(wave, self.volume_threshold, self.silence_check_chunk)
+                start_idx = check_silence_end_point(
+                    wave, self.volume_threshold, self.silence_check_chunk, self.silence_check_stride
+                )
 
                 if start_idx is None and not record_start:
                     waiting_length_for_timeout += self.buffer_size
