@@ -7,8 +7,9 @@ VRChatに対話型 AIシステムを実装するためのリポジトリです�
 ## 環境  
 - Windows 10 64bit
 - Python 3.9  
-- Miniforge
+- Miniforge3 https://github.com/conda-forge/miniforge
 - NVIDIA GeForce RTX Graphics card
+- CMake https://cmake.org/download/
 
 ## コマンド
 
@@ -66,6 +67,42 @@ Recongnized: <話した声>
 
 Responce: <AIのレスポンス>
 
+...
+```
+
+### テキストチャットのみのモード  
+音声認識を使用せずに、テキストチャットのみも使用できます。  
+
+```sh
+python -m vrchatbot chat
+```  
+
+* output
+
+```
+Setting up...
+Ready.
+人間: こんばんわ
+人工知能:   「こんばんわにゃあ」
+人間: <入力待ち>  
+...
+```  
+
+
+### 文字起こしのみのモード
+言語処理を行わず、音声認識モデルのみを使用することもできます。  
+
+```sh
+python -m vrchatbot recognize 
+```
+
+* output
+
+```
+Setting up...
+Ready.
+ja: 文字認識は始まっています。
+ja: このようにして文字を認識できます。
 ...
 ```
 

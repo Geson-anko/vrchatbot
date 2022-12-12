@@ -38,12 +38,16 @@ def test_ChatBot_make_tail_space():
     bot.make_tail_space()  # nothing do
 
     bot.current_token_size = 15
-    bot.stored_prompts.append("")
-    bot.stored_prompts_token_sizes.append(15)
+    bot.stored_prompts.append("a")
+    bot.stored_prompts.append("b")
+    bot.stored_prompts.append("c")
+    bot.stored_prompts_token_sizes.append(3)
+    bot.stored_prompts_token_sizes.append(5)
+    bot.stored_prompts_token_sizes.append(7)
     bot.make_tail_space()
-    assert bot.current_token_size == 0
-    assert list(bot.stored_prompts) == []
-    assert list(bot.stored_prompts_token_sizes) == []
+    assert bot.current_token_size == 7
+    assert list(bot.stored_prompts) == ["c"]
+    assert list(bot.stored_prompts_token_sizes) == [7]
 
 
 def test_ChatBot_responce():
