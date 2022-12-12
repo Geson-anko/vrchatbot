@@ -10,3 +10,15 @@ def test_TextSpeaker():
 
     speaker = cls(sc.default_speaker().name)
     speaker.speak_text("こんばんわ")
+
+    speaker = cls()
+    assert speaker.speaker.name == sc.default_speaker().name
+
+    class SomeClass:
+        pass
+
+    try:
+        cls(SomeClass())
+        assert False, "ValueError must be occured!"
+    except ValueError:
+        pass
