@@ -1,3 +1,4 @@
+import os
 from argparse import ArgumentParser
 from datetime import datetime
 
@@ -19,11 +20,12 @@ def get_parser() -> ArgumentParser:
 
     parser.add_argument("command", type=str, choices=[DISPLAY_AUDIO_DEVICES, RUN, CHAT])
     parser.add_argument("-c", "--config_file_path", type=str, default="botconfig.toml")
+    parser.add_argument("--log_dir", type=str, default="data/logs/")
 
     return parser
 
 
-def main(config: dict) -> None:
+def main(args, config: dict) -> None:
     print("Setting up...")
     recorder = Recorder(**config["Recorder"])
     speech_recognizer = SpeechRecongition(
@@ -35,7 +37,7 @@ def main(config: dict) -> None:
 
     log_file_name = datetime.now().strftime("%Y-%m-%d %H-%M-%S.log")
 
-    with open(f"data/logs/{log_file_name}", "a", encoding="utf-8") as logf:
+    with open(os.path.join(args.log_dir, log_file_name), "a", encoding="utf-8") as logf:
         while True:
             wave = recorder.record_audio_until_silence(5)
             if wave is None:
@@ -55,13 +57,13 @@ def main(config: dict) -> None:
             speaker.speak_text(responce)
 
 
-def chat(config: dict) -> None:
+def chat(args, config: dict) -> None:
     print("Setting up...")
     chatbot = ChatBot(**config["ChatBot"])
     print("Ready.")
 
     log_file_name = datetime.now().strftime("%Y-%m-%d %H-%M-%S.log")
-    with open(f"data/logs/{log_file_name}", "a", encoding="utf-8") as logf:
+    with open(os.path.join(args.log_dir, log_file_name), "a", encoding="utf-8") as logf:
         while True:
             user_input = input(chatbot.human_name)
             logf.write(f"{chatbot.human_name}{user_input}\n")
@@ -79,7 +81,7 @@ if __name__ == "__main__":
         display_audio_devices()
     elif args.command == RUN:
         cfg = toml.load(args.config_file_path)
-        main(cfg)
+        main(args, cfg)
     elif args.command == CHAT:
         cfg = toml.load(args.config_file_path)
-        chat(cfg)
+        chat(args, cfg)
