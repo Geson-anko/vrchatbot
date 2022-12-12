@@ -55,14 +55,14 @@ def test_Recorder__init__():
     assert recoder.silence_check_chunk == 512
     assert recoder.max_recording_duration == 15
 
-    recorder = cls(None)
+    recorder = cls()
     assert recorder.mic.name == sc.default_microphone().name
 
     class SomeClass:
         pass
 
     try:
-        cls(SomeClass)
+        cls(SomeClass())
         assert False, "ValueError must be occured!"
     except ValueError:
         pass
