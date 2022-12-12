@@ -80,7 +80,7 @@ class Recorder:
 
     def __init__(
         self,
-        mic_index_or_name: Union[str, int],
+        mic_index_or_name: Optional[Union[str, int]] = None,
         buffer_size: int = 4096,
         sample_rate: int = RECOGNIZE_SAMPLE_RATE,
         silence_duration_for_stop: float = 0.5,  # seconds
@@ -91,7 +91,8 @@ class Recorder:
     ) -> None:
         """
         Args:
-            mic_index_or_name (str | int): Mic index or name. You can check with `display_audio_devices`
+            mic_index_or_name (Optional[str | int]): Mic index or name. You can check with `display_audio_devices`
+                If `None`, default microphone will be used.
             buffer_size (int): Recording buffer size.
             sample_rate: (int): Default 16kHz
             silence_duration_for_stop (float): Seconds.  If it is silent during this time, recording will be interrupted.
@@ -104,17 +105,22 @@ class Recorder:
             ValueError: if mic_index_or_name is not str or int.
         """
 
-        if isinstance(mic_index_or_name, str):
-            id = mic_index_or_name
-        elif isinstance(mic_index_or_name, int):
-            id = sc.all_microphones(True)[mic_index_or_name].name
+        if mic_index_or_name is None:
+            self.mic = sc.default_microphone()
         else:
-            raise ValueError("Type of `mic_index_or_name must be str or int. Input: {}".format(type(mic_index_or_name)))
+            if isinstance(mic_index_or_name, str):
+                id = mic_index_or_name
+            elif isinstance(mic_index_or_name, int):
+                id = sc.all_microphones(True)[mic_index_or_name].name
+            else:
+                raise ValueError(
+                    "Type of `mic_index_or_name must be str or int. Input: {}".format(type(mic_index_or_name))
+                )
 
-        self.mic = sc.get_microphone(
-            id=id,
-            include_loopback=True,
-        )
+            self.mic = sc.get_microphone(
+                id=id,
+                include_loopback=True,
+            )
 
         self.buffer_size = buffer_size
         self.sample_rate = sample_rate
