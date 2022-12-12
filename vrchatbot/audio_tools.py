@@ -1,5 +1,7 @@
 import math
-from typing import Optional, Union
+import queue
+import threading
+from typing import Any, Optional, Union
 
 import numpy as np
 import pyopenjtalk
@@ -123,6 +125,8 @@ class Recorder:
         self.max_recording_duration = max_recording_duration
         self.silence_check_stride = silence_check_stride
 
+        self._shutdown = False
+
     def record_audio_until_silence(self, waiting_timeout: float = 5) -> Optional[np.ndarray]:
         """Recording from mic until silence continues decided duration. And, Record begins when
         there is no silence.
@@ -176,6 +180,99 @@ class Recorder:
                     break
 
             return np.concatenate(recorded_waves)
+
+    def record_forever(self, wave_queue: Union[queue.Queue, Any]) -> None:
+        """Record audio forever.
+
+        Args:
+            wave_queue (Queue): Queue for storing recorded waves.
+                wave type is 1d `np.ndarray`.
+        """
+        self._shutdown = False
+
+        send_and_reset = False
+
+        record_start = False
+        recorded_waves = []
+        silence_length = 0
+        recorded_length = 0
+
+        with self.mic.recorder(self.sample_rate, 1) as mic:
+            while not self._shutdown:
+
+                if send_and_reset:
+                    if len(recorded_waves) > 0:
+                        wave_queue.put(np.concatenate(recorded_waves))
+
+                    record_start = False
+                    recorded_waves.clear()
+                    recorded_length = 0
+                    silence_length = 0
+
+                    send_and_reset = False
+
+                wave = mic.record(self.buffer_size).reshape(-1).astype("float32")
+                start_idx = check_silence_end_point(
+                    wave, self.volume_threshold, self.silence_check_chunk, self.silence_check_stride
+                )
+
+                if start_idx is None and not record_start:
+                    continue
+
+                elif start_idx is not None and not record_start:
+                    wave = wave[:start_idx]
+                    record_start = True
+
+                elif start_idx is None and record_start:
+                    silence_length += len(wave)
+
+                recorded_length += len(wave)
+                recorded_waves.append(wave)
+
+                if silence_length >= int(self.silence_duration_for_stop * self.sample_rate):
+                    send_and_reset = True
+                    continue
+
+                if recorded_length >= int(self.max_recording_duration * self.sample_rate):
+                    send_and_reset = True
+                    continue
+
+            if len(recorded_waves) > 0:
+                wave_queue.put(np.concatenate(recorded_waves))  # For test code.
+
+    _record_forever_thread: Optional[threading.Thread] = None
+
+    def record_forever_background(
+        self, wave_queue: Optional[Union[queue.Queue, Any]] = None, is_daemon: bool = False
+    ) -> Union[queue.Queue, Any]:
+        """Throw :meth:`record_forever` to background thread.
+        Args:
+            wave_queue (Optional[Union[Queue, Any]]): Queue for storing recorded waves.
+            is_daemon (bool): Whether `record_forever` thread is daemon thread or not.
+
+        Returns:
+            wave_queue (Queue): Queue for storing recorded waves.
+        """
+
+        if wave_queue is None:
+            q = queue.Queue()
+        else:
+            q = wave_queue
+
+        self._record_forever_thread = threading.Thread(target=self.record_forever, args=(q,), daemon=is_daemon)
+        self._record_forever_thread.start()
+        return q
+
+    def shutdown_record_forever(self, timeout: Optional[float] = None) -> None:
+        """Shutdown (stop) `record_forever` thread.
+
+        Args:
+            timeout (Optional[float]): Waiting for shutdown until timeout.
+        """
+        self._shutdown = True
+
+        if self._record_forever_thread is not None:
+            self._record_forever_thread.join(timeout)
 
 
 class TextSpeaker:

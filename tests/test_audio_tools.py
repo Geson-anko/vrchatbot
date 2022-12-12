@@ -1,4 +1,6 @@
 import math
+import queue
+import threading
 import time
 
 import matplotlib.pyplot as plt
@@ -88,6 +90,102 @@ def test_Recorder_record_audio_until_silence():
     if isinstance(wave, np.ndarray):
         plt.plot(wave)
         plt.savefig(f"data/test_results/{__name__}.test_Recorder_record_audio_until_silence.png")
+
+
+@pytest.mark.slow
+@pytest.mark.skipif(len(sc.all_microphones(True)) == 0, reason="No audio devices")
+def test_Recoder_record_forever():
+    cls = mod.Recorder
+
+    # recording
+    chunk = 1024
+    duration = 2
+    sample_rate = 16000
+    recorder = cls(
+        sc.default_microphone().name,
+        chunk,
+        sample_rate=sample_rate,
+        volume_threshold=-1,
+        max_recording_duration=duration,
+        silence_duration_for_stop=duration * 2,
+    )
+
+    def late_shutdown(n_secs, recorder):
+        time.sleep(n_secs)
+        recorder._shutdown = True
+
+    threading.Thread(target=late_shutdown, args=(duration * 2 + 1, recorder)).start()
+    q = queue.Queue()
+    recorder.record_forever(q)
+    assert q.qsize() > 1
+    wav = q.get()
+    assert isinstance(wav, np.ndarray)
+    assert len(wav) == math.ceil(sample_rate * duration / chunk) * chunk
+
+    # Check ignoring silence
+
+    recorder = cls(
+        sc.default_microphone().name,
+        chunk,
+        sample_rate=sample_rate,
+        volume_threshold=1,
+        max_recording_duration=duration,
+        silence_duration_for_stop=duration * 2,
+    )
+
+    threading.Thread(target=late_shutdown, args=(duration * 2 + 1, recorder)).start()
+    q = queue.Queue()
+    recorder.record_forever(q)
+    assert q.qsize() == 0
+
+
+@pytest.mark.slow
+@pytest.mark.skipif(len(sc.all_microphones(True)) == 0, reason="No audio devices")
+def test_Recoder_record_forever_background_and_shutdown():
+    cls = mod.Recorder
+
+    chunk = 1024
+    duration = 2
+    sample_rate = 16000
+
+    # No recording
+    recorder = cls(
+        sc.default_microphone().name,
+        chunk,
+        sample_rate=sample_rate,
+        volume_threshold=1,
+        max_recording_duration=duration,
+        silence_duration_for_stop=duration * 2,
+    )
+
+    assert recorder._record_forever_thread is None
+    q = recorder.record_forever_background()
+    assert isinstance(q, queue.Queue)
+    assert isinstance(recorder._record_forever_thread, threading.Thread)
+    assert recorder._record_forever_thread.isDaemon() is False
+    recorder.shutdown_record_forever()
+    assert recorder._shutdown is True
+    assert recorder._record_forever_thread.is_alive() is False
+
+    # Recording
+    recorder = cls(
+        sc.default_microphone().name,
+        chunk,
+        sample_rate=sample_rate,
+        volume_threshold=-1,
+        max_recording_duration=duration,
+        silence_duration_for_stop=duration * 2,
+    )
+
+    input_q = queue.Queue()
+    q = recorder.record_forever_background(input_q, True)
+    assert q is input_q
+    assert recorder._record_forever_thread.isDaemon() is True
+    assert recorder._record_forever_thread.is_alive() is True
+
+    time.sleep(duration * 2 + 1)
+    recorder.shutdown_record_forever()
+    assert q.qsize() > 0
 
 
 @pytest.mark.skipif(len(sc.all_speakers()) == 0, reason="No audio devices")
