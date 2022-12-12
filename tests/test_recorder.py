@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import soundcard as sc
 
-from vrchatbot import audio_tools as mod
+from vrchatbot import recorder as mod
 
 
 def test_display_audio_devices():
