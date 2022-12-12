@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import soundcard as sc
 
-from vrchatbot import audio_tools as mod
+from vrchatbot import recorder as mod
 
 
 def test_display_audio_devices():
@@ -186,11 +186,3 @@ def test_Recoder_record_forever_background_and_shutdown():
     time.sleep(duration * 2 + 1)
     recorder.shutdown_record_forever()
     assert q.qsize() > 0
-
-
-@pytest.mark.skipif(len(sc.all_speakers()) == 0, reason="No audio devices")
-def test_TextSpeaker():
-    cls = mod.TextSpeaker
-
-    speaker = cls(sc.default_speaker().name)
-    speaker.speak_text("こんばんわ")
