@@ -7,8 +7,9 @@ VRChatに対話型 AIシステムを実装するためのリポジトリです�
 ## 環境  
 - Windows 10 64bit
 - Python 3.9  
-- Miniforge
+- Miniforge3 https://github.com/conda-forge/miniforge
 - NVIDIA GeForce RTX Graphics card
+- CMake https://cmake.org/download/
 
 ## コマンド
 
