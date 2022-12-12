@@ -7,8 +7,8 @@ from datetime import datetime
 import toml
 from whisper import DecodingOptions
 
-from .audio_tools import Recorder, display_audio_devices
 from .chatbot import ChatBot
+from .recorder import Recorder, display_audio_devices
 from .speech_recongnition import SpeechRecongition
 from .text_speaker import TextSpeaker
 
