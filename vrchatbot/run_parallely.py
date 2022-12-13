@@ -75,6 +75,8 @@ def run_parallely(
                     pass
     except KeyboardInterrupt:
         pass
+    except Exception as e:
+        print(e)
 
     print("Shutdown...")
 
