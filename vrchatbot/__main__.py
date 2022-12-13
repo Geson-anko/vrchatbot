@@ -9,6 +9,7 @@ from whisper import DecodingOptions
 
 from .chatbot import ChatBot
 from .recorder import Recorder, display_audio_devices
+from .run_parallely import run_parallely
 from .speech_recongnition import SpeechRecongition
 from .text_speaker import TextSpeaker
 
@@ -16,13 +17,14 @@ DISPLAY_AUDIO_DEVICES = "audio-devices"
 RUN = "run"
 CHAT = "chat"
 RECOGNIZE = "recognize"
+RUN_PARALLELY = "run-parallely"
 
 
 def get_parser() -> ArgumentParser:
     """Making argument parser."""
     parser = ArgumentParser()
 
-    parser.add_argument("command", type=str, choices=[DISPLAY_AUDIO_DEVICES, RUN, CHAT, RECOGNIZE])
+    parser.add_argument("command", type=str, choices=[DISPLAY_AUDIO_DEVICES, RUN, CHAT, RECOGNIZE, RUN_PARALLELY])
     parser.add_argument("-c", "--config_file_path", type=str, default="botconfig.toml")
     parser.add_argument("--log_dir", type=str, default="data/logs/")
 
@@ -102,6 +104,20 @@ def recoginize_forever(args, config: dict) -> None:
             time.sleep(0.01)
 
 
+def _run_parallely_main(args, config: dict) -> None:
+    """Parallely."""
+    print("Setting up...")
+    recorder = Recorder(**config["Recorder"])
+    speech_recognizer = SpeechRecongition(
+        options=DecodingOptions(**config["DecodingOption"]), **config["SpeechRecognition"]
+    )
+    chatbot = ChatBot(**config["ChatBot"])
+    speaker = TextSpeaker(**config["Speaker"])
+    print("Ready.")
+
+    run_parallely(recorder, speech_recognizer, chatbot, speaker, args.log_dir)
+
+
 if __name__ == "__main__":
 
     parser = get_parser()
@@ -118,3 +134,6 @@ if __name__ == "__main__":
     elif args.command == RECOGNIZE:
         cfg = toml.load(args.config_file_path)
         recoginize_forever(args, cfg)
+    elif args.command == RUN_PARALLELY:
+        cfg = toml.load(args.config_file_path)
+        _run_parallely_main(args, cfg)
