@@ -1,3 +1,7 @@
+# 重要: VRChatコミュニティガイドライン、リッピング等の禁止に抵触しているためVRChat上での使用はできません！ 
+OpenAI GPTのAPIを使用している都合上、会話データのログが記録されてしまうからです。  
+https://hello.vrchat.com/legal
+
 # VRChat Bot
 
 VRChatに対話型 AIシステムを実装するためのリポジトリです。
