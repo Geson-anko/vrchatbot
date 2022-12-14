@@ -57,7 +57,7 @@ class ChatBot:
                 temperature=self.temperature,
                 **self.completion_kwds,
             )
-            self.behaivour_prompt_token_size = resp["usage"]["completion_tokens"]
+            self.behaivour_prompt_token_size = resp["usage"]["prompt_tokens"]
         else:
             self.behaivour_prompt_token_size = 0
 
@@ -105,9 +105,11 @@ class ChatBot:
         )
 
         text = resp["choices"][0]["text"]
-        self.stored_prompts_token_sizes.append(resp["usage"]["completion_tokens"] - self.current_token_size)
+        self.stored_prompts_token_sizes.append(resp["usage"]["prompt_tokens"] - self.current_token_size)
         self.stored_prompts.append(user_input)
-        self.stored_prompts_token_sizes.append(resp["usage"]["prompt_tokens"])
+        self.stored_prompts_token_sizes.append(resp["usage"]["completion_tokens"])
         self.stored_prompts.append(text)
+
+        self.current_token_size = resp["usage"]["total_tokens"]
 
         return text
