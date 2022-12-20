@@ -42,7 +42,7 @@
 その旨に同意しますか？
 ```
 
-![agreement_sample_img](data/agreement_sample.png)  
+![agreement_sample_img](/data/agreement_sample.png)  
 
 ## グループ方式のルールについて  
 (整備中)
