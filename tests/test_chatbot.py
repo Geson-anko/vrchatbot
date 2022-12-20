@@ -60,3 +60,11 @@ def test_ChatBot_responce():
         print("User:", i)
         resp_text = bot.responce(i)
         print("AI:", resp_text)
+
+    prompts = "".join(list(bot.stored_prompts)).split("\n")[:-1]
+
+    assert len(prompts) % 2 == 0
+
+    for i in range(0, len(prompts), 2):
+        assert prompts[i].startswith(bot.human_name)
+        assert prompts[i + 1].startswith(bot.ai_name)

@@ -94,7 +94,7 @@ class ChatBot:
         else:
             head = [self.behaivour_prompt]
 
-        sending_prompt = " ".join(head + list(self.stored_prompts) + [user_input])
+        sending_prompt = "".join(head + list(self.stored_prompts) + [user_input])
 
         resp = openai.Completion.create(
             engine=self.engine,
@@ -108,7 +108,7 @@ class ChatBot:
         self.stored_prompts_token_sizes.append(resp["usage"]["prompt_tokens"] - self.current_token_size)
         self.stored_prompts.append(user_input)
         self.stored_prompts_token_sizes.append(resp["usage"]["completion_tokens"])
-        self.stored_prompts.append(text)
+        self.stored_prompts.append(text + "\n")
 
         self.current_token_size = resp["usage"]["total_tokens"]
 
