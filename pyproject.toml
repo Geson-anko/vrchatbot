@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vrchatbot"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = ["Geson-anko <59220704+Geson-anko@users.noreply.github.com>"]
 
